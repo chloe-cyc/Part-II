@@ -32,7 +32,7 @@ for i in range (len(pop_1)):
     population_data.append(column)
 
 population_data = np.array(population_data) #Shape 10001 x n x 1
-
+population_data = population_data[:,:,0]
 #Initial population P(0)
 p_init = population_data[1]
 
@@ -87,14 +87,15 @@ def p_model(k, t):
 # ks = np.logspace(-3,3)
 # fs = [function_to_minimize(np.array([k])) for k in ks]
 # plt.semilogx(ks,fs,".")
-# plt.show()
+# plt.show
 
+states = 1
 def residuals(k):
+
     p_model_result = np.array([p_model(k, ti) for ti in time_t])
-    #difference = population_data[:,0,0]-p_model_result[:,0,0]
-    print(population_data[:,0,0])
-    print(p_model_result[:,0,0])
-    return population_data[:,0,0]-p_model_result[:,0,0]
+    return population_data[:,states,0]-p_model_result[:,states,0]
+
+
 
 least_squares_result = least_squares(residuals, initial_guess_k, bounds=(np.array([1e-3]),np.array([1e3])))
 least_squares_result_min = least_squares_result.x
