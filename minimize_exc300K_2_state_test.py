@@ -25,14 +25,15 @@ pop_2 = total_pop-pop_1
 
 #Population Vectors
 eq_pop=np.array([equilibrium_pop_1, equilibrium_pop_2])
+population_data = np.column_stack((pop_1,pop_2))
 #stack this population_vec = [pop_1, pop_2]
-population_data = []
-for i in range (len(pop_1)):
-    column = np.array([[pop_1[i]],[pop_2[i]]])
-    population_data.append(column)
+# population_data = []
+# for i in range (len(pop_1)):
+#     column = np.array([[pop_1[i]],[pop_2[i]]])
+#     population_data.append(column)
 
-population_data = np.array(population_data) #Shape 10001 x n x 1
-population_data = population_data[:,:,0]
+# population_data = np.array(population_data) #Shape 10001 x n x 1
+# population_data = population_data[:,:,0]
 #Initial population P(0)
 p_init = population_data[1]
 
@@ -93,7 +94,7 @@ states = 1
 def residuals(k):
 
     p_model_result = np.array([p_model(k, ti) for ti in time_t])
-    return population_data[:,states,0]-p_model_result[:,states,0]
+    return population_data[:,states]-p_model_result[:,states]
 
 
 
@@ -120,7 +121,7 @@ p_1_opt_result = p_opt_result[:,0]
 
 #Plotting The results of the initial guess
 plt.plot(time_t, p_1_test_result,".")
-plt.plot(time_t, p_1_opt_result,".")
+plt.plot(time_t, p_1_opt_result,"-")
 plt.plot(time_t, pop_1,".")
 legend = ["1","1_opt","actual1"]
 plt.legend(legend)
