@@ -12,6 +12,8 @@ for i in range(1,8):
     column_names.append(str(i))
 # Over Time in ps
 df = pd.read_csv(excitation_data_path, delimiter=" ", names=column_names)
+df = df[df["Time"]<=2000]
+df = df[(df.index % 5 == 0) | (df.index == 0) | (df.index == len(df) - 1)]
 
 #Selected columns to NP array of size 10001 x7
 time_t = df["Time"].values
@@ -26,12 +28,11 @@ eq_pop = population_data[-1]
 p_init = population_data[0]
 
 #Optimizing w/ initial guess for k
-initial_guess_k = np.array([0.001,0.001,0.001,0.001,0.001,0.001,0.001])
+initial_guess_k = np.array([0.01,0.01,0.001,0.001,0.001,0.001])
 no_states = 7 #number of states
 
 #Interchange between a flattened k and a k matrix
 def list_to_matk(k): 
-    
     matk = np.zeros((no_states,no_states))
 
     for i in range(no_states):
@@ -50,7 +51,7 @@ def matk_to_matr(k):
                 matr[i][j] = matk[i][j]*eq_pop[i] # I want i !=j to be completed first 
 
     for h in range (n): #let matrix ij be also written as jh to avoid clashing in the same defined equation
-        matr[h][h] = -sum(matr[j][h] for j in range(n) if j != h) 
+        matr[h][h] = -sum(matr[j][h]*eq_pop[j] for j in range(n) if j != h) 
     return matr
 
 def p_model(k, t):
@@ -60,30 +61,6 @@ def p_model(k, t):
     exp_rt = expm(r_t)
     p_t = exp_rt.dot(p_init)
     return p_t
-
-#TEST OF K
-p_test_result = []
-for t in time_t:
-    p_model_test = p_model(initial_guess_k,t)
-    p_test_result.append(p_model_test)
-p_test_result = np.array(p_test_result)
-print(p_test_result)
-
-#Plotting The results of the initial guess
-count_plot =0
-
-for column_name in column_names[1:]:
-    plt.plot(time_t, df[column_name],".", label=column_name)
-    plt.plot(time_t, p_test_result[:,count_plot],"-")
-    count_plot+=1
-
-# plt.plot(time_t, p_1_test_result,".")
-# plt.plot(time_t, pop_1,".")
-
-plt.legend()
-plt.xlabel("Time(ps)")
-plt.ylabel("Population (1-n)")
-plt.show(block=True)
 
 # def function_to_minimize(k):
 #     sum=0
@@ -98,14 +75,39 @@ plt.show(block=True)
 # plt.semilogx(ks,fs,".")
 # plt.show
 
-# def residuals(k):
+def residuals(k):
+    p_model_result = np.array([p_model(k, ti) for ti in time_t])
+    return ((population_data -p_model_result)**2).flatten()
+    #return population_data[:,1]-p_model_result[:,1] #define the state for which we want 
 
-#     p_model_result = np.array([p_model(k, ti) for ti in time_t])
+least_squares_result = least_squares(residuals, initial_guess_k, method="lm")
+least_squares_result = least_squares_result.x
+print(least_squares_result)
 
-#     return population_data[:,no_states]-p_model_result[:,no_states] #define the state for which we want 
 
-# least_squares_result = least_squares(residuals, initial_guess_k, bounds=(np.array([1e-3]),np.array([1e3])))
-# least_squares_result_min = least_squares_result.x
+#TEST OF K
+p_test_result = []
+p_least_squares = []
+for t in time_t:
+    p_model_test = p_model(initial_guess_k,t)
+    p_test_result.append(p_model_test)
+    p_model_least_squares = p_model(least_squares_result,t)
+    p_least_squares.append(p_model_least_squares)
+p_test_result = np.array(p_test_result)
+p_least_squares = np.array(p_least_squares)
+
+#Plotting The results of the initial guess
+
+for i,column_name in enumerate(column_names[2:],start=1):
+    c = 'C%i'%i
+    plt.plot(time_t, df[column_name],":", label=column_name, color=c)
+    plt.plot(time_t, p_test_result[:, i],"-", color=c,label=f"_test")
+    plt.plot(time_t, p_least_squares[:,i],"--",color=c, label=f"_ls")
+
+plt.legend()
+plt.xlabel("Time(ps)")
+plt.ylabel("Population (1-n)")
+plt.show(block=True)
 
 # p_test_result = []
 # p_opt_result = []
@@ -124,7 +126,7 @@ plt.show(block=True)
 # np.savetxt(file_names[0], p_opt_result, delimiter = "\t",newline='\n')
 
 
-# #Plotting The results of the initial guess
+# #Plotting The results of the initial guessd
 # plt.plot(time_t, p_1_test_result,".")
 # plt.plot(time_t, p_1_opt_result,"-")
 # plt.plot(time_t, pop_1,".")
