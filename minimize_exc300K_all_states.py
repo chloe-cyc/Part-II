@@ -51,7 +51,7 @@ def matk_to_matr(k):
                 matr[i][j] = matk[i][j]*eq_pop[i] # I want i !=j to be completed first 
 
     for h in range (n): #let matrix ij be also written as jh to avoid clashing in the same defined equation
-        matr[h][h] = -sum(matr[j][h]*eq_pop[j] for j in range(n) if j != h) 
+        matr[h][h] = -sum(matr[j][h] for j in range(n) if j != h) 
     return matr
 
 def p_model(k, t):
