@@ -5,7 +5,7 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 
-def listk_to_matk(k):
+def listk_to_matr(k):
     index=0
     mat_k = np.zeros((no_states,no_states))
     for i in range(no_states):
@@ -49,22 +49,23 @@ def p_model(kappa, t):
     return p_t
 
 #Calculate test-population using k values
-k_array = np.array([0.12,0.13,0.14,0.15,0.16,0.17])
+k_array = np.array([0.9,0.13,0.14,0.15,0.16,2])
 p_init= np.array([1,0,0])
 no_states = 3 #number of states
-mat_k = listk_to_matk(k_array)
+mat_r_k = listk_to_matr(k_array)
+print(np.linalg.eig(mat_r_k))  
 
 #Generation of exponential data from k using P = e^Rt
 time_t = np.arange(0, 50,0.1)
 population_data = []
 for t in time_t:
-    exp_rt = expm(mat_k*t).dot(p_init)
+    exp_rt = expm(mat_r_k*t).dot(p_init)
     population_data.append(exp_rt)
 population_data = np.array(population_data)
 
 #equilibrium population
 eq_pop = population_data[-1]
-
+print(eq_pop)
 
 def residuals(kappa):
     p_model_result = np.array([p_model(kappa, ti) for ti in time_t])
@@ -74,25 +75,24 @@ def residuals(kappa):
 kappa_to_test = np.array([0.01,0.01,0.01])
 least_squares_result = least_squares(residuals, kappa_to_test, method="lm")
 least_squares_kappa_result = np.array(least_squares_result.x)
-print(f"this is the test k {mat_k}")
+print(f"this is the test k {mat_r_k}")
 print(f"this is ls result in terms of kappa {least_squares_kappa_result}")
 least_squares_kappa_rmatrix = matkappa_to_matr(least_squares_kappa_result)
 
 print(f"this is the k matrix computed from kappa {least_squares_kappa_rmatrix }")
 
 
-# p_least_squares = []
+p_least_squares = []
 # p_test_result = []
-# for t in time_t:
+for t in time_t:
 #     p_model_test = p_model(kappa_to_test,t)
 #     p_test_result.append(p_model_test)
-#     p_model_least_squares = p_model(least_squares_kappa_result,t)
-#     p_least_squares.append(p_model_least_squares)
-# p_test_result = np.array(p_test_result)
-# p_least_squares = np.array(p_least_squares)
+    p_model_least_squares = p_model(least_squares_kappa_result,t)
+    p_least_squares.append(p_model_least_squares)
+# p_test_result = np.array(p_test_result) 
+p_least_squares = np.array(p_least_squares)
 # column_names = ["Time", "1", "2"]
 
-#Checking that calculated kappa gives k
 
 
 #Plotting
@@ -100,8 +100,9 @@ c=1
 for i in range(no_states):
     plt.plot(time_t, population_data[:,i],":")
     # plt.plot(time_t, p_test_result[:, i],"-", color=colors,label=f"_test")
-    # plt.plot(time_t, p_least_squares[:,i],"--",color=colors, label=f"_ls")
-    # c +=1
+    plt.plot(time_t, p_least_squares[:,i],"--", label=f"_ls")
+
+
 plt.legend()
 plt.xlabel("Time(ps)")
 plt.ylabel("Population (1-n)")
