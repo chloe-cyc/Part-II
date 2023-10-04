@@ -12,8 +12,9 @@ for i in range(1,8):
     column_names.append(str(i))
 # Over Time in ps
 df = pd.read_csv(excitation_data_path, delimiter=" ", names=column_names)
-df = df[df["Time"]<=2000]
-df = df[(df.index % 5 == 0) | (df.index == 0) | (df.index == len(df) - 1)]
+df = df[df["Time"]<=4000]
+#df = df[df["Time"]>500]
+#df = df[(df.index % 10 == 0) | (df.index == len(df) - 1)]
 
 #Selected columns to NP array of size 10001 x7
 time_t = df["Time"].values
@@ -28,7 +29,7 @@ eq_pop = population_data[-1]
 p_init = population_data[0]
 
 #Optimizing w/ initial guess for k
-initial_guess_k = np.array([0.01,0.01,0.001,0.001,0.001,0.001])
+initial_guess_kappa = np.array([30,5,.001,0.001,0.001,1])
 no_states = 7 #number of states
 
 #Interchange between a flattened k and a k matrix
@@ -47,7 +48,7 @@ def matk_to_matr(k):
     matr = np.zeros((n,n))
     for i in range(n):
         for j in range(n):
-            if i != j:
+            if (i != j) == True:
                 matr[i][j] = matk[i][j]*eq_pop[i] # I want i !=j to be completed first 
 
     for h in range (n): #let matrix ij be also written as jh to avoid clashing in the same defined equation
@@ -58,7 +59,7 @@ def p_model(k, t):
     r_of_t = matk_to_matr(k)
     #print(np.linalg.eig(r_of_t))
     r_t = r_of_t*t
-    exp_rt = expm(r_t)
+    exp_rt = expm(0.7*r_t)
     p_t = exp_rt.dot(p_init)
     return p_t
 
@@ -80,7 +81,7 @@ def residuals(k):
     return ((population_data -p_model_result)**2).flatten()
     #return population_data[:,1]-p_model_result[:,1] #define the state for which we want 
 
-least_squares_result = least_squares(residuals, initial_guess_k, method="lm")
+least_squares_result = least_squares(residuals, initial_guess_kappa, method="lm")
 least_squares_result = least_squares_result.x
 print(least_squares_result)
 
@@ -89,30 +90,33 @@ print(least_squares_result)
 p_test_result = []
 p_least_squares = []
 for t in time_t:
-    p_model_test = p_model(initial_guess_k,t)
+    p_model_test = p_model(initial_guess_kappa,t)
     p_test_result.append(p_model_test)
     p_model_least_squares = p_model(least_squares_result,t)
     p_least_squares.append(p_model_least_squares)
 p_test_result = np.array(p_test_result)
 p_least_squares = np.array(p_least_squares)
 
+
+
 #Plotting The results of the initial guess
 
 for i,column_name in enumerate(column_names[2:],start=1):
     c = 'C%i'%i
     plt.plot(time_t, df[column_name],":", label=column_name, color=c)
-    plt.plot(time_t, p_test_result[:, i],"-", color=c,label=f"_test")
-    plt.plot(time_t, p_least_squares[:,i],"--",color=c, label=f"_ls")
+    #plt.plot(time_t, p_test_result[:, i],"-", color=c,label=f"_test")
+    plt.plot(time_t, p_least_squares[:,i],"--",color=c, label=f"{column_name}_ls")
 
-plt.legend()
+plt.legend(bbox_to_anchor=(1.04, 1), borderaxespad=0)
 plt.xlabel("Time(ps)")
+#plt.xlim(500,4000)
 plt.ylabel("Population (1-n)")
 plt.show(block=True)
 
 # p_test_result = []
 # p_opt_result = []
 # for t in time_t:
-#     p_model_test = p_model(initial_guess_k, t)
+#     p_model_test = p_model(initial_guess_kappa, t)
 #     p_model_opt = p_model(least_squares_result_min,t)
 #     p_test_result.append(p_model_test)
 #     p_opt_result.append(p_model_opt)
