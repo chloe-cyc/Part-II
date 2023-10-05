@@ -49,27 +49,27 @@ def p_model(kappa, t):
     return p_t
 
 #Calculate test-population using k values
-k_array = np.array([20,0.01,0.01,0.01,0.01,20])
+#k_array = np.array([20,0.01,0.01,0.01,0.01,20])
 #k12,13,21,23,31,32
-# kappa_array = np.array([20,1,0.0001])
-# eq_pop = np.array([0.5,0.3,0.2])
+kappa_array = np.array([20,1,0.0001])
+eq_pop = np.array([0.5,0.3,0.2])
 p_init= np.array([1,0,0])
 no_states = 3 #number of states
-mat_r_k = listk_to_matr(k_array)
+#mat_r_k = listk_to_matr(k_array)
 # print(np.linalg.eig(mat_r_k))  
 #print(matkappa_to_matr(kappa_array))
 #Generation of exponential data from k using P = e^RtP(0)
-time_t = np.arange(0, 200,0.01)
+time_t = np.arange(0, 10,0.0001)
 population_data = []
-for t in time_t:
-    exp_rt = expm(mat_r_k*t).dot(p_init)
-    population_data.append(exp_rt)
-population_data = np.array(population_data)
+# for t in time_t:
+#     exp_rt = expm(mat_r_k*t).dot(p_init)
+#     population_data.append(exp_rt)
+# population_data = np.array(population_data)
 
 #Generation of exponential data from kappa using P = e^TtP(0)
-# for t in time_t:
-#     population_data.append(p_model(kappa_array, t))
-# population_data = np.array(population_data)
+for t in time_t:
+    population_data.append(p_model(kappa_array, t))
+population_data = np.array(population_data)
 
 #equilibrium population
 # eq_pop = population_data[-1]
@@ -90,7 +90,7 @@ def residuals(kappa):
 # print(f"this is the k matrix computed from kappa {least_squares_kappa_rmatrix }")
 
 
-p_least_squares = []
+# p_least_squares = []
 # p_test_result = []
 # for t in time_t:
 #     p_model_test = p_model(kappa_to_test,t)
