@@ -79,27 +79,27 @@ def residuals(kappa):
     p_model_result = np.array([p_model(kappa, ti) for ti in time_t])
     return ((population_data-p_model_result)**2).flatten()
 
-# #Optimization
-# kappa_to_test = np.array([0.01,0.01,0.01])
-# least_squares_result = least_squares(residuals, kappa_to_test, method="lm")
-# least_squares_kappa_result = np.array(least_squares_result.x)
-# #print(f"this is the test kappa {mat_r_k}")
-# print(f"this is ls result in terms of kappa {least_squares_kappa_result}")
-# least_squares_kappa_rmatrix = matkappa_to_matr(least_squares_kappa_result)
+#Optimization
+kappa_to_test = np.array([0.01,0.01,0.01])
+least_squares_result = least_squares(residuals, kappa_to_test, method="lm")
+least_squares_kappa_result = np.array(least_squares_result.x)
+#print(f"this is the test kappa {mat_r_k}")
+print(f"this is ls result in terms of kappa {least_squares_kappa_result}")
+least_squares_kappa_rmatrix = matkappa_to_matr(least_squares_kappa_result)
 
-# print(f"this is the k matrix computed from kappa {least_squares_kappa_rmatrix }")
+print(f"this is the k matrix computed from kappa {least_squares_kappa_rmatrix }")
 
 
-# p_least_squares = []
-# p_test_result = []
-# for t in time_t:
-#     p_model_test = p_model(kappa_to_test,t)
-#     p_test_result.append(p_model_test)
-    # p_model_least_squares = p_model(least_squares_kappa_result,t)
-    # p_least_squares.append(p_model_least_squares)
-# p_test_result = np.array(p_test_result) 
-#p_least_squares = np.array(p_least_squares)
-# column_names = ["Time", "1", "2"]
+p_least_squares = []
+p_test_result = []
+for t in time_t:
+    #p_model_test = p_model(kappa_to_test,t)
+  #  p_test_result.append(p_model_test)
+    p_model_least_squares = p_model(least_squares_kappa_result,t)
+    p_least_squares.append(p_model_least_squares)
+#p_test_result = np.array(p_test_result) 
+p_least_squares = np.array(p_least_squares)
+column_names = ["Time", "1", "2"]
 
 
 
@@ -108,7 +108,7 @@ c=1
 for i in range(no_states):
     plt.plot(time_t, population_data[:,i],":")
     # plt.plot(time_t, p_test_result[:, i],"-", color=colors,label=f"_test")
-    #plt.plot(time_t, p_least_squares[:,i],"--", label=f"_ls")
+    plt.plot(time_t, p_least_squares[:,i],"--", label=f"_ls")
 
 
 plt.legend()
