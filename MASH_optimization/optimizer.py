@@ -2,7 +2,7 @@ import numpy as np
 from scipy.linalg import expm
 from scipy.optimize import least_squares
 
-def optimize(data, initial_kappas):
+def optimize(self,data, initial_kappas):
 
     def listkap_matkappa(kappa):
         matkappa = np.zeros((no_states,no_states))
