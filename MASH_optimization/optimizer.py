@@ -2,7 +2,7 @@ import numpy as np
 from scipy.linalg import expm
 from scipy.optimize import least_squares
 
-def optimize(self,data, initial_kappas):
+def optimize(data, initial_kappas, eq_pop, full_time, full_population):
 
     def listkap_matkappa(kappa):
         matkappa = np.zeros((no_states,no_states))
@@ -30,7 +30,7 @@ def optimize(self,data, initial_kappas):
         r_of_t = matkappa_matr(kappa)
         exp_r_del_t = expm(r_of_t*delta_t)
         p_model_result = p_model(exp_r_del_t) 
-        residual = ((population_data -p_model_result)**2).flatten()
+        residual = (population_data -p_model_result).flatten()
         return residual
 
     #Inputs 
@@ -38,20 +38,25 @@ def optimize(self,data, initial_kappas):
     population_data = data[:,1:]
     delta_t = time[1]-time[0]
     no_states = len(population_data[0])
-    eq_pop = population_data[-1]
     init_pop = population_data[0]
     time_size = time.size
 
     #Optimization
     least_squares_result = least_squares(residuals, initial_kappas, method="lm")
     optimized_kappa = least_squares_result.x
+    optimized_r = matkappa_matr(optimized_kappa)
+    print(np.linalg.eig(optimized_r)[0])
 
-    #Calculation of states
+    #Calculation of statepopulation for output
+    time_size = full_time.size
     r_of_t_ls = matkappa_matr(optimized_kappa)
     exp_ls_del_t = expm(r_of_t_ls*delta_t)
     optimized_population = np.array(p_model(exp_ls_del_t))
-    time = time[:,np.newaxis]
+    time = full_time[:,np.newaxis]
+    population_data = full_population[:,1:]
+    loss = sum(residuals(optimized_kappa)**2)
+    print(least_squares_result.status)
     optimized_population = np.concatenate((time, optimized_population), axis=1)
 
-    return optimized_population, optimized_kappa
+    return optimized_population, optimized_kappa, loss
 
