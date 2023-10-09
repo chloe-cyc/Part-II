@@ -46,7 +46,7 @@ def residuals(kappa):
 
 # DATA IMPORT - Using Pandas because it is easier to me
 column_names = ["Time"]
-site_data_path = "/u/dem/kebl6911/Part-II/MASH_optimization/Data/mash_site300K.dat"
+site_data_path = "Data/mash_site300K.dat"
 for i in range(1,8):
     column_names.append(str(i))
 
@@ -97,3 +97,4 @@ np.savetxt(f"Site_data/least_squares_kappas.dat", kappa_saved, delimiter="\t")
 timer_end = time.time()
 excecution_time =  timer_end-timer_start
 print(f"excecution time {excecution_time}")
+

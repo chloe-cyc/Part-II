@@ -12,7 +12,7 @@ start_time = time.time()
 
 # DATA IMPORT - Using Pandas because it is easier to me
 column_names = ["Time"]
-excitation_data_path = "/u/dem/kebl6911/Part-II/MASH_optimization/Data/mash_exc300K.dat"
+excitation_data_path = "Data/mash_exc300K.dat"
 for i in range(1,8):
     column_names.append(str(i))
     
@@ -134,11 +134,14 @@ p_least_squares = []
 #p_test_result.append(p_model_test)
 r_of_t_ls = new_matkappa_to_matr(least_squares_result)
 exp_ls_del_t = expm(r_of_t_ls*delta_t)
-p_model_least_squares = np.array(p_model(exp_ls_del_t,time_t.size))
+p_model_least_squares = p_model(exp_ls_del_t,time_t.size)
+
+result = np.hstack([np.array([time_t]).reshape((-1,1)),p_model_least_squares])
+print(result.shape)
 
 # # # #p_test_result = np.array(p_test_result)
 # # p_least_squares = np.array(p_least_squares)
-# np.savetxt("exc_ls.dat",p_model_least_squares, delimiter="\t")
+np.savetxt("result_exc_ls.dat",result, delimiter="\t")
 
 # end_time = time.time()
 # excecution_time =  end_time-start_time
