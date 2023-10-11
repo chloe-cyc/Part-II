@@ -41,7 +41,7 @@ def optimize(data, initial_kappas, eq_pop, full_time, full_population): #full_ti
     no_states = len(population_data[0])
     init_pop = population_data[0]
     time_size = time.size
-
+    data_size = time_size
     #Optimization
     #Enforce kappa>0
     least_squares_result = least_squares(residuals, initial_kappas, bounds=(0,float("inf"))) # bounds=(-float("inf"),1e-17)
@@ -55,7 +55,7 @@ def optimize(data, initial_kappas, eq_pop, full_time, full_population): #full_ti
     # print(optimized_eigenvalues)
 
     # Calculation of state population for output
-    population_data = full_population[:,1:]
+    # population_data = full_population[:,1:]
     time_size = full_time.size
     r_of_t_ls = matkappa_matr(optimized_kappa)
     exp_ls_del_t = expm(r_of_t_ls*delta_t)
@@ -64,12 +64,10 @@ def optimize(data, initial_kappas, eq_pop, full_time, full_population): #full_ti
     
     # loss = sum(residuals(optimized_kappa)**2)
     # print(least_squares_result.status)
-    residual = residuals(optimized_kappa)
-    residual_sum = sum(abs(residuals(optimized_kappa)))
-    print(full_time.shape)
-    print(optimized_population.shape)
+    residual_sum_divided = sum(abs(residuals(optimized_kappa)))/data_size
+
 
     optimized_population = np.concatenate((full_time, optimized_population), axis=1)
 
 
-    return residual, residual_sum, optimized_population
+    return residual_sum_divided

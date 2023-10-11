@@ -21,7 +21,7 @@ no_states = 7#number of states
 num_elements = no_states*(no_states-1)//2
 initial_guess_kappa = np.full(num_elements,0.01) 
 residual_sum = []
-residual_only =[]
+
 
 #Start time
 # end_time_values = np.array(exc_df['Time'].iloc[4::5])
@@ -34,14 +34,14 @@ for index, end_time in enumerate(end_time_values, start=1):
     print(f"run {index}")
     #Only consider values that are larger than the start_time
     exc_data = exc_values[exc_values[:,0] <= end_time]
-    residuals, residual_sum_val, optimized_data = optimize(exc_data, initial_guess_kappa,eq_pop,full_time,exc_values)
+    residual_val, residual_sum_val, optimized_data = optimize(exc_data, initial_guess_kappa,eq_pop,full_time,exc_values)
     residual_sum.append(residual_sum_val)
-    residual_only.append(residuals)
+
     #kappa_saved.append(index, least_squares_result)
-    np.savetxt(f"Exc_residuals/{end_time}_{index}.dat", optimized_data, delimiter="\t")
+    np.savetxt(f"Exc_residuals/Divided_residuals/{end_time}_{index}.dat", optimized_data, delimiter="\t")
 
 
 residual_data = np.column_stack((end_time_values,residual_sum))
-np.savetxt(f"Exc_residuals/residual_data.dat", residual_data,delimiter="\t")
-np.savetxt(f"Exc_residuals/residual_values.dat", residual_only)
+np.savetxt(f"Exc_residuals/Divided_residuals/residualdivided_data.dat", residual_data,delimiter="\t")
+
 
