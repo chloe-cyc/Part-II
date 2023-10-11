@@ -55,12 +55,12 @@ def optimize(data, initial_kappas, eq_pop, full_time, full_population): #full_ti
     # print(optimized_eigenvalues)
 
     #Calculation of statepopulation for output
+    population_data = full_population[:,1:]
     time_size = full_time.size
     r_of_t_ls = matkappa_matr(optimized_kappa)
     exp_ls_del_t = expm(r_of_t_ls*delta_t)
     optimized_population = np.array(p_model(exp_ls_del_t))
     time = full_time[:,np.newaxis]
-    population_data = full_population[:,1:]
     # loss = sum(residuals(optimized_kappa)**2)
     # print(least_squares_result.status)
     optimized_population = np.concatenate((time, optimized_population), axis=1)
