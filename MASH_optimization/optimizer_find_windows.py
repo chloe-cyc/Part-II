@@ -2,7 +2,7 @@ import numpy as np
 from scipy.linalg import expm
 from scipy.optimize import least_squares
 
-def optimize(data, initial_kappas, eq_pop, full_time, full_population): #full_time, full_population
+def optimize(data, initial_kappas, eq_pop, full_time): #full_time, full_population
 
     def listkap_matkappa(kappa):
         matkappa = np.zeros((no_states,no_states))
@@ -29,7 +29,7 @@ def optimize(data, initial_kappas, eq_pop, full_time, full_population): #full_ti
     def residuals(kappa):
         r_of_t = matkappa_matr(kappa)
         exp_r_del_t = expm(r_of_t*delta_t)
-        p_model_result = p_model(exp_r_del_t) 
+        p_model_result = p_model(exp_r_del_t)
         residual = (population_data -p_model_result).flatten()
         # residual = population_data -p_model_result
         return residual
@@ -55,19 +55,18 @@ def optimize(data, initial_kappas, eq_pop, full_time, full_population): #full_ti
     # print(optimized_eigenvalues)
 
     # Calculation of state population for output
-    # population_data = full_population[:,1:]
-    time_size = full_time.size
+    #time_size = full_time.size
     r_of_t_ls = matkappa_matr(optimized_kappa)
     exp_ls_del_t = expm(r_of_t_ls*delta_t)
     optimized_population = np.array(p_model(exp_ls_del_t))
-    full_time = full_time[:,np.newaxis]
+    #full_time = full_time[:,np.newaxis]
+    full_time = time[:,np.newaxis]
     
     # loss = sum(residuals(optimized_kappa)**2)
     # print(least_squares_result.status)
     residual_sum_divided = sum(abs(residuals(optimized_kappa)))/data_size
 
-
     optimized_population = np.concatenate((full_time, optimized_population), axis=1)
 
 
-    return residual_sum_divided
+    return residual_sum_divided, optimized_population
