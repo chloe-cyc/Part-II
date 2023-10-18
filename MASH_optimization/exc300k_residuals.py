@@ -42,7 +42,7 @@ for index, end_time in enumerate(end_time_values, start=1):
     #np.savetxt(f"Exc_residuals/limited_population/{end_time}_{index}.dat", optimized_data, delimiter="\t")
 
 
-residual_data = np.column_stack((end_time_values,residual_sum))
-np.savetxt(f"Exc_residuals/limited_population/residualdivided_data.dat", residual_data,delimiter="\t")
+# residual_data = np.column_stack((end_time_values,residual_sum))
+# np.savetxt(f"Exc_residuals/limited_population/residualdivided_data.dat", residual_data,delimiter="\t")
 
 
