@@ -77,8 +77,8 @@ def optimize(data, initial_kappas, initial_p_zero, eq_pop, full_time, t_one): #t
     # optimized_kappa = least_squares_result.x
 
     r_of_t_ls = matkappa_matr(optimized_kappa)
-    t_diff = time[-1]
-    eq_pop_calc = expm(r_of_t_ls*t_diff).dot(initial_p_zero)
+    t_diff = full_time[-1]
+    eq_pop_calc = expm(r_of_t_ls*t_diff).dot(optimized_pzero)
     exp_ls_del_t = expm(r_of_t_ls*delta_t)
     neg_exp_ls_del_t = expm(r_of_t_ls*-delta_t)
     
@@ -90,19 +90,40 @@ def optimize(data, initial_kappas, initial_p_zero, eq_pop, full_time, t_one): #t
     #New p_0 for calculation of residuals from t_one to t_two
     
     p_zero = p_model_split(optimized_params,t_one)
-    print(p_zero)
     optimized_params = np.concatenate((optimized_kappa, p_zero))
 
     #additional_resid = eq_pop-p_model_split(optimized_params,full_time[-1])
     #residual = (sum(abs(residuals(optimized_params)))+sum(abs(additional_resid)))/time_size#/no_states # Calculate the residual between t_1 and t_2 only
-    residual = sum(abs(residuals(optimized_params)))/time_size
+    # residual = sum(abs(residuals(optimized_params)))/time_size
 
     # #full_time = full_time[full_time[:]<=t_one]
     # full_time = full_time[full_time[:] >=t_one]
-    full_time = full_time[:,np.newaxis] # IF we want to propogate the calculation to calculate from 0 to the full length of time that we have
-    time_size = full_time.size
-    optimized_population_fromtzero = np.array(p_model(exp_ls_del_t,initial_p_zero))
-    optimized_population = optimized_population_fromtzero
-    optimized_population = np.concatenate((full_time, optimized_population), axis=1)
+    # IF we want to propogate the calculation to calculate from 0 to the full length of time that we have
+    # if time[0] != 0.0:
+    #     post_time = full_time[full_time[:]>=time[0]]
+    #     time_size = post_time.size
+    #     optimized_population_fromtzero = np.array(p_model(exp_ls_del_t,optimized_pzero))
+    #     pre_time = full_time[full_time[:]< time[0]]
+    #     print("hello")
+    #     time_size = pre_time.size
+    #     optimized_population_beforetzero = np.array(p_model(neg_exp_ls_del_t, optimized_pzero))
+    #     optimized_population_beforetzero = optimized_population_beforetzero[::-1]
+    #     print(optimized_population_beforetzero.shape)
+    #     optimized_population = np.vstack((optimized_population_beforetzero,optimized_population_fromtzero))
+    #     print(optimized_population.shape)
+    # else:
+    #     time_size = full_time.size
+    #     optimized_population = np.array(p_model(exp_ls_del_t,optimized_pzero))
 
-    return residual, optimized_population, optimized_kappa, eq_pop_calc
+    #UNCOMMENT
+    # full_time = full_time[full_time[:]>=t_one]
+    # time_size = full_time.size
+    # delta_t = full_time[1]-full_time[0]
+    # exp_ls_del_t = expm(r_of_t_ls*delta_t)
+    # optimized_population = np.array(p_model(exp_ls_del_t,p_zero)) 
+    # full_time = full_time[:,np.newaxis] 
+    # optimized_population = np.concatenate((full_time, optimized_population), axis=1)
+
+    
+    #return residual, optimized_population, optimized_kappa, eq_pop_calc
+    return optimized_kappa, eq_pop_calc
