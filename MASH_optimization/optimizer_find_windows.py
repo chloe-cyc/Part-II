@@ -2,7 +2,7 @@ import numpy as np
 from scipy.linalg import expm
 from scipy.optimize import least_squares
 
-def optimize(data, initial_kappas, initial_p_zero, eq_pop, full_time, t_one): #t_one, t_two, full_time): #full_time, full_population
+def optimize(data, initial_kappas, initial_p_zero, eq_pop, full_time, t_one,weight): #t_one, t_two, full_time): #full_time, full_population
 
     def listkap_matkappa(kappa):
         matkappa = np.zeros((no_states,no_states))
@@ -32,7 +32,9 @@ def optimize(data, initial_kappas, initial_p_zero, eq_pop, full_time, t_one): #t
         r_of_t = matkappa_matr(kappa)
         exp_r_del_t = expm(r_of_t*delta_t)
         p_model_result = p_model(exp_r_del_t,p_zero)
-        residual = (population_data -p_model_result).flatten()
+        residual = (population_data-p_model_result).flatten()
+        additional_resid = eq_pop-p_model_split(params,full_time[-1])
+        residual = np.append(residual,additional_resid*weight)
         return residual
 
     def p_model_split(params,t):
@@ -92,9 +94,12 @@ def optimize(data, initial_kappas, initial_p_zero, eq_pop, full_time, t_one): #t
     p_zero = p_model_split(optimized_params,t_one)
     optimized_params = np.concatenate((optimized_kappa, p_zero))
 
-    #additional_resid = eq_pop-p_model_split(optimized_params,full_time[-1])
+    additional_resid = eq_pop-p_model_split(optimized_params,full_time[-1])
     #residual = (sum(abs(residuals(optimized_params)))+sum(abs(additional_resid)))/time_size#/no_states # Calculate the residual between t_1 and t_2 only
-    # residual = sum(abs(residuals(optimized_params)))/time_size
+    residual = residuals(optimized_params)
+    residual_1 = ((sum(abs(residual))-sum(abs(additional_resid)))/time_size+weight)/no_states
+    residual_2 = (sum(abs(residual))/time_size)/no_states
+    #residual_3 = (sum(abs(residual))/time_size)/no_states
 
     # #full_time = full_time[full_time[:]<=t_one]
     # full_time = full_time[full_time[:] >=t_one]
@@ -116,14 +121,14 @@ def optimize(data, initial_kappas, initial_p_zero, eq_pop, full_time, t_one): #t
     #     optimized_population = np.array(p_model(exp_ls_del_t,optimized_pzero))
 
     #UNCOMMENT
-    # full_time = full_time[full_time[:]>=t_one]
-    # time_size = full_time.size
-    # delta_t = full_time[1]-full_time[0]
-    # exp_ls_del_t = expm(r_of_t_ls*delta_t)
-    # optimized_population = np.array(p_model(exp_ls_del_t,p_zero)) 
-    # full_time = full_time[:,np.newaxis] 
-    # optimized_population = np.concatenate((full_time, optimized_population), axis=1)
+    full_time = full_time[full_time[:]>=t_one]
+    time_size = full_time.size
+    delta_t = full_time[1]-full_time[0]
+    exp_ls_del_t = expm(r_of_t_ls*delta_t)
+    optimized_population = np.array(p_model(exp_ls_del_t,p_zero)) 
+    full_time = full_time[:,np.newaxis] 
+    optimized_population = np.concatenate((full_time, optimized_population), axis=1)
 
     
-    #return residual, optimized_population, optimized_kappa, eq_pop_calc
-    return optimized_kappa, eq_pop_calc
+    return residual_1,residual_2, optimized_population, optimized_kappa, eq_pop_calc
+    #return optimized_kappa, eq_pop_calc
