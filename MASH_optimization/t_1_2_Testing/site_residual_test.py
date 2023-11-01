@@ -1,5 +1,5 @@
 #from scipy.optimize import minimize as min
-from optimizer_find_windows import optimize
+from optimizer_find_windows1 import optimize
 import numpy as np
 import pandas as pd
 
@@ -35,25 +35,26 @@ weight=2
 start_time_values = start_time_values[start_time_values<=t_one]
 start_time_values = start_time_values[:-10]
 residual_sum = []
-residual_sum_2 = []
-final_pop = []
+kap_saved = []
+pop_zero_save = []
 for index, start_time in enumerate(start_time_values, start=1):
     print(f"run {index}")
+    print(f"start time {start_time}")
     #Only consider values that are smaller than the end time
     site_data = site_values[site_values[:,0] >= start_time]
-    initial_guess_p = site_data[0,:]
-    initial_guess_p = initial_guess_p[1:]
-    residual_1, residual_2, optimized_data, prev_kap_1,calc_final = optimize(site_data, prev_kap, initial_guess_p, eq_pop, full_time,t_one,weight) #t_one,t_two, full_time)
+    initial_p = site_data[0,:]
+    initial_p = initial_p[1:]
+    residual, optimized_data, prev_kap_1, p_zero_new = optimize(site_data, prev_kap, initial_p, eq_pop, full_time,t_one) #t_one,t_two, full_time)
     prev_kap = prev_kap_1
-    residual_sum.append(residual_1)
-    residual_sum_2.append(residual_2)
-    final_pop.append(calc_final)
+    residual_sum.append(residual)
+    kap_saved.append(prev_kap_1)
+    pop_zero_save.append(p_zero_new)
     #kappa_saved.append(index, least_squares_result)
-    np.savetxt(f"/u/dem/kebl6911/Part-II/MASH_optimization/t_1_2_Testing/w2_t1_800_t2_1000/{start_time}_{index}.dat", optimized_data, delimiter="\t")
+    np.savetxt(f"/u/dem/kebl6911/Part-II/MASH_optimization/t_1_2_Testing/t1_800_t2_1000_1/{start_time}_{index}.dat", optimized_data, delimiter="\t")
 
 residual_data1 = np.column_stack((start_time_values,residual_sum))
-residual_data2 = np.column_stack((start_time_values,residual_sum_2))
-final_pop = np.column_stack((start_time_values,final_pop))
-np.savetxt(f"/u/dem/kebl6911/Part-II/MASH_optimization/t_1_2_Testing/w2_800_1000_resid1.dat",residual_data1, delimiter = "\t")
-np.savetxt(f"/u/dem/kebl6911/Part-II/MASH_optimization/t_1_2_Testing/w2_800_1000_resid2.dat",residual_data2, delimiter = "\t")
-np.savetxt(f"/u/dem/kebl6911/Part-II/MASH_optimization/t_1_2_Testing/w_800_1000_final_pop.dat", final_pop,delimiter="\t")
+kap_save = np.column_stack((start_time_values,kap_saved))
+pop_zero_save = np.column_stack((start_time_values,pop_zero_save))
+np.savetxt(f"/u/dem/kebl6911/Part-II/MASH_optimization/t_1_2_Testing/800_1000_resid.dat",residual_data1, delimiter = "\t")
+np.savetxt(f"/u/dem/kebl6911/Part-II/MASH_optimization/t_1_2_Testing/800_1000_kap_saved.dat",kap_save, delimiter = "\t")
+np.savetxt(f"/u/dem/kebl6911/Part-II/MASH_optimization/t_1_2_Testing/w_800_1000_final_pop.dat", pop_zero_save,delimiter="\t")
