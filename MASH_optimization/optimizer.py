@@ -2,7 +2,7 @@ import numpy as np
 from scipy.linalg import expm
 from scipy.optimize import least_squares
 
-def optimize(data, initial_kappas, eq_pop, full_time, full_population): #full_time, full_population
+def optimize(data, initial_kappas, eq_pop, full_time, full_population):
 
     def listkap_matkappa(kappa):
         matkappa = np.zeros((no_states,no_states))
@@ -31,7 +31,6 @@ def optimize(data, initial_kappas, eq_pop, full_time, full_population): #full_ti
         exp_r_del_t = expm(r_of_t*delta_t)
         p_model_result = p_model(exp_r_del_t) 
         residual = (population_data -p_model_result).flatten()
-        # residual = population_data -p_model_result
         return residual
 
     #Inputs 
@@ -46,25 +45,19 @@ def optimize(data, initial_kappas, eq_pop, full_time, full_population): #full_ti
     #Enforce kappa>0
     least_squares_result = least_squares(residuals, initial_kappas, bounds=(0,float("inf"))) # bounds=(-float("inf"),1e-17)
     optimized_kappa = least_squares_result.x
-    print(optimized_kappa)
-    # for kappa in optimized_kappa_1:
-    #     least_squares_bounded_result = least_squares(residuals, kappa, bounds = (-1.))
-        
     optimized_r = matkappa_matr(optimized_kappa)
-    optimized_eigenvalues = np.linalg.eig(optimized_r)[0]
-    # print(optimized_eigenvalues)
+    print(np.linalg.eig(optimized_r)[0])
 
     #Calculation of statepopulation for output
-    population_data = full_population[:,1:]
     time_size = full_time.size
     r_of_t_ls = matkappa_matr(optimized_kappa)
     exp_ls_del_t = expm(r_of_t_ls*delta_t)
     optimized_population = np.array(p_model(exp_ls_del_t))
     time = full_time[:,np.newaxis]
-    # loss = sum(residuals(optimized_kappa)**2)
-    # print(least_squares_result.status)
+    population_data = full_population[:,1:]
+    loss = sum(residuals(optimized_kappa)**2)
+    print(least_squares_result.status)
     optimized_population = np.concatenate((time, optimized_population), axis=1)
 
-
-    return optimized_population, optimized_eigenvalues, optimized_kappa
+    return optimized_population, optimized_kappa, loss
 
