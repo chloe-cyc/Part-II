@@ -7,14 +7,19 @@ import pandas as pd
 #IMPORT DATA
 
 column_names = ["Time"]
-site_data_path = "../Data/mash_site77K.dat"
+site_data_path = "/u/dem/kebl6911/Part-II/MASH_optimization/Data/mash_exc300K.dat"
+
 for i in range(1,8):
     column_names.append(str(i))
 site_df = pd.read_csv(site_data_path, delimiter=" ", names=column_names)
 site_df = site_df[(site_df.index % 10 == 0) | (site_df.index == len(site_df.index) - 1)]
 
+# classical = "../Data/mash_site77K.dat"
+# class_df = pd.read_csv(classical, delimiter=" ", names=column_names)
+# class_df = class_df[(class_df.index % 10 == 0) | (class_df.index == len(site_df.index) - 1)]
+
 # All the values within the df
-site_eq = site_df.values 
+class_eq = site_df.values 
 full_time = site_df["Time"].values
 
 # #Define ts
@@ -28,7 +33,8 @@ site_df = site_df[site_df["Time"]<=t2]
 start_to_t2= site_df.values #DF to NP
 
 no_states = 7
-eq_pop = site_eq[-1]
+eq_pop = class_eq[-1]
+#eq_pop = np.mean(eq_pop, axis=0)
 eq_pop = eq_pop[1:8]
 
 save_kappas = []
@@ -39,7 +45,7 @@ save_t = []
 save_p1s = []
 save_neg = []
 
-t1s = 20*np.arange(1,100)
+t1s = 20*np.arange(1,70)
 #t1s = np.array([80])
 for t1 in t1s:
     try:
@@ -97,10 +103,8 @@ save_resid2 = np.column_stack((save_t,save_resid2))
 save_resid3 = np.column_stack((save_t,save_resid3))
 save_neg = np.column_stack((save_t,save_neg))
 
-np.savetxt(f"scan_0_5000_site77_resid1.dat", save_resid1, delimiter = "\t")
-np.savetxt(f"scan_0_5000_site77_resid2.dat", save_resid2, delimiter = "\t")
-np.savetxt(f"scan_0_5000_site77_resid3.dat", save_resid3, delimiter = "\t")
-np.savetxt(f"scan_0_5000_site77_neghalf.dat", save_neg, delimiter = "\t")
-np.savetxt(f"scan_0_5000_site77_kappas.dat", save_kappas, delimiter = "\t")
-
-
+np.savetxt(f"scan_0_5000_exc_resid1.dat", save_resid1, delimiter = "\t")
+np.savetxt(f"scan_0_5000_exc_resid2.dat", save_resid2, delimiter = "\t")
+np.savetxt(f"scan_0_5000_exc_resid3.dat", save_resid3, delimiter = "\t")
+np.savetxt(f"scan_0_5000_exc_neghalf.dat", save_neg, delimiter = "\t")
+np.savetxt(f"scan_0_5000_exc_kappas.dat", save_kappas, delimiter = "\t")

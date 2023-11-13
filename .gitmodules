@@ -1,0 +1,3 @@
+[submodule "pyrho"]
+	path = pyrho
+	url = https://github.com/berkelbach-group/pyrho.git
