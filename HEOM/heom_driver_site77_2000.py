@@ -38,7 +38,7 @@ def main():
 
 
     #for (K,L) in [(1,5),(2,5),(3,5),(4,5),(5,5),(6,5)]:
-    for (K,L) in [(1,4),(2,4),(3,4),(4,4),(5,4),(6,4)]:
+    for (K,L) in [(2,2),(2,3),(3,3),(3,2)]:
     # for (K,L) in [(0,1),(0,2),(1,2),(0,4),(0,6)]:
         print(K,L)
         # Spectral densities - a list of length 'nbath'
@@ -61,7 +61,7 @@ def main():
                     """ From exciton to site basis """
                     rho_0 = np.einsum('kl,lm,mn->kn', U, rho_0, U.T)
                 print(T, tau, init)
-                times, rhos_site = my_heom.propagate(rho_0, 0.0, 2000.0, 1.0)
+                times, rhos_site = my_heom.propagate(rho_0, 0.0, 10000.0, 1.0)
 
                 if basis=='exc':
                     rhos_site = np.einsum('kl,tlm,mn->tkn',U.T,rhos_site,U)
