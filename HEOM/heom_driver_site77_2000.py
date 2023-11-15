@@ -38,7 +38,7 @@ def main():
 
 
     #for (K,L) in [(1,5),(2,5),(3,5),(4,5),(5,5),(6,5)]:
-    for (K,L) in [(1,4),(2,4),(3,4),(4,4)]:
+    for (K,L) in [(1,4),(2,4),(3,4),(4,4),(5,4),(6,4)]:
     # for (K,L) in [(0,1),(0,2),(1,2),(0,4),(0,6)]:
         print(K,L)
         # Spectral densities - a list of length 'nbath'
