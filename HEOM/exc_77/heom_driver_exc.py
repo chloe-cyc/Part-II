@@ -38,12 +38,16 @@ def main():
 
 
     #for (K,L) in [(1,5),(2,5),(3,5),(4,5),(5,5),(6,5)]:
+<<<<<<< Updated upstream:HEOM/exc_77/heom_driver_exc.py
     for (K,L) in [(2,2),(2,3)]:
+=======
+    for (K,L) in [(2,2)]:
+>>>>>>> Stashed changes:HEOM/heom_driver_site77_2000.py
     # for (K,L) in [(0,1),(0,2),(1,2),(0,4),(0,6)]:
         print(K,L)
         # Spectral densities - a list of length 'nbath'
         lamda = 35.0
-        for [tau,T] in [[50.,77]]:
+        for [tau,T] in [[50.,300]]:
             omega_c = 1.0/tau # in 1/fs
             kT = kB*T
             spec_densities = [['ohmic-lorentz', lamda, omega_c]]*nbath
