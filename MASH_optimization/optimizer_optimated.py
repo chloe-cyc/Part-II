@@ -89,7 +89,7 @@ class Optimizer:
         """
         if (direction == 'back'):
             time = time[::-1]
-        assert len(kappa) is self.ns*(self.ns-1)//2
+        assert len(kappa) == self.ns*(self.ns-1)//2
         r = self.matkappa_matr(kappa)
         dt = time[1]-time[0]
         exp_rdt = expm(r*dt)
