@@ -38,17 +38,20 @@ class Optimizer:
     #     matkappa[triangle]= kappa
     #     matkappa += matkappa.T
     #     return matkappa
+        
+    def test(self):
+        a = self.known_k
+        return a
 
     def listkap_matkappa(self, kappa):
         ''' Calculate the kappa matrix from the list of diagonal and upper right non-diagonal kappas.
         '''
-
         matkappa = np.zeros((self.ns,self.ns))
         triangle = np.triu(np.ones((self.ns, self.ns), dtype=bool), k=1)
-        matkappa[triangle] = kappa  # Populate upper right non-diagonal elements
+        matkappa[triangle] = -kappa  # Populate upper right non-diagonal elements
         matkappa += matkappa.T  # Symmetric adjustment
         for i in range(self.ns): 
-            matkappa[i, i] = -self.known_k[i] - np.sum(matkappa[i, :])
+            matkappa[i, i] = self.known_k[i] + np.sum(matkappa[i, :])
 
         return matkappa
 
@@ -76,7 +79,7 @@ class Optimizer:
         res       root mean square error
         kappa_opt optimal kappa
         '''
-        ls_result = least_squares(self.residuals,self.initial_kappas,bounds=(0,float("inf")))#,xtol=None,ftol=1e-8)
+        ls_result = least_squares(self.residuals,self.initial_kappas,bounds=(0,float("inf")),xtol=None,ftol=1e-8)
         kappa_opt = ls_result.x
         self.kappa_opt = kappa_opt
         res = np.sqrt(2.*ls_result.cost/(self.time_size*self.ns))
