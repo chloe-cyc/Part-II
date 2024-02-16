@@ -43,12 +43,13 @@ save_p1s = []
 save_neg = []
 
 t1s = 5*np.arange(6,400)
-
+###
 for t1 in t1s:
     try:
         save_t.append(t1)
         t0 = t1/2
         print(t1)
+
         data = site_df[site_df["Time"]<=t1]
         
         start_to_t1= data.values #DF to NP
@@ -62,6 +63,7 @@ for t1 in t1s:
 
         #Array of t0 to use
         start_to_t1_time = start_to_t1[:,0]
+
         
         # Train using function+ Calculate residual for full training set:
         optimize_init = Optimizer(start_to_t1, eq_pop, no_states, initial_kappas=None)
@@ -100,8 +102,8 @@ save_resid2 = np.column_stack((save_t,save_resid2))
 save_resid3 = np.column_stack((save_t,save_resid3))
 save_neg = np.column_stack((save_t,save_neg))
 
-np.savetxt(f"scan_0_5000_site300_resid1.dat", save_resid1, delimiter = "\t")
-np.savetxt(f"scan_0_5000_site300_resid2.dat", save_resid2, delimiter = "\t")
-np.savetxt(f"scan_0_5000_site300_resid3.dat", save_resid3, delimiter = "\t")
-np.savetxt(f"scan_0_5000_site300_neghalf.dat", save_neg, delimiter = "\t")
-np.savetxt(f"scan_0_5000_site300_kappas.dat", save_kappas, delimiter = "\t")
+np.savetxt(f"scan_0_5000_exc_resid1.dat", save_resid1, delimiter = "\t")
+np.savetxt(f"scan_0_5000_exc_resid2.dat", save_resid2, delimiter = "\t")
+np.savetxt(f"scan_0_5000_exc_resid3.dat", save_resid3, delimiter = "\t")
+np.savetxt(f"scan_0_5000_exc_neghalf.dat", save_neg, delimiter = "\t")
+np.savetxt(f"scan_0_5000_exc_kappas.dat", save_kappas, delimiter = "\t")

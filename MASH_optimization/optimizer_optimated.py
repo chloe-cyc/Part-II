@@ -19,7 +19,7 @@ class Optimizer:
           self.initial_kappas = initial_kappas
 
         data = data[::-1,:]
-        self.time = data[:,0]
+        self.time = data[:,0] #This is already back
         self.pop = data[:,1:8]
         self.eq_pop = eq_pop
         self.ns = ns
@@ -88,7 +88,7 @@ class Optimizer:
         direction
         """
         if (direction == 'back'):
-            time = time[::-1]
+            time = time[::-1] #Time is running back so this converts it to forwards
         assert len(kappa) == self.ns*(self.ns-1)//2
         r = self.matkappa_matr(kappa)
         dt = time[1]-time[0]
